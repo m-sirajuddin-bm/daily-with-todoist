@@ -1,0 +1,6 @@
+https://todoist.com/oauth/authorize?client_id=824870cd96994f51b8f1f78ca6e2948c&scope=task:add,data:read,data:delete,data:read_write,project:delete&state=sgdME7jme5
+
+client_id = 824870cd96994f51b8f1f78ca6e2948c
+client_secret = b18d32db42b247de9a84f6ffae524549
+scope = task:add,data:read,data:delete,data:read_write,project:delete
+state = <random_string>
