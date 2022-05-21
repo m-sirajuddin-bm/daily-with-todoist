@@ -26,16 +26,77 @@ body,
 
 @layer components {
   .input {
-    @apply w-full rounded-lg border-gray-500 bg-transparent
-   text-gray-500 placeholder-gray-500 outline-none focus-visible:ring-2 focus-visible:ring-primary-600
-    dark:text-gray-400 dark:placeholder-gray-400;
+    @apply w-full rounded-lg border-gray-500  bg-transparent text-gray-500
+   placeholder-gray-500 shadow-sm outline-none focus-visible:ring-1
+    focus-visible:ring-primary-600 dark:text-gray-400 dark:placeholder-gray-400;
   }
 
   .textarea {
     @apply relative w-full rounded-lg border-gray-500 bg-transparent px-4
     text-sm text-gray-500
-    placeholder-gray-500 outline-none focus:ring-0 focus-visible:ring-2 focus-visible:ring-primary-600
-    dark:text-gray-400 dark:placeholder-gray-400;
+    placeholder-gray-500 shadow-sm outline-none focus:ring-0
+    focus-visible:ring-1 focus-visible:ring-primary-600 dark:text-gray-400 dark:placeholder-gray-400;
+  }
+
+  .pure-material-progress-linear {
+    @apply fixed top-0 left-0 h-1 w-full appearance-none border-0 bg-accent-500 text-base text-accent-100;
+  }
+
+  .pure-material-progress-linear::-webkit-progress-bar {
+    @apply bg-transparent;
+  }
+
+  /* Determinate */
+  .pure-material-progress-linear::-webkit-progress-value {
+    @apply bg-current transition-all duration-200;
+  }
+
+  .pure-material-progress-linear::-moz-progress-bar {
+    @apply bg-current transition-all duration-200;
+  }
+
+  .pure-material-progress-linear::-ms-fill {
+    @apply border-0 bg-current transition-all duration-200;
+  }
+
+  /* Indeterminate */
+  .pure-material-progress-linear:indeterminate {
+    background-size: 200% 100%;
+    background-image: linear-gradient(
+      to right,
+      transparent 50%,
+      currentColor 50%,
+      currentColor 60%,
+      transparent 60%,
+      transparent 71.5%,
+      currentColor 71.5%,
+      currentColor 84%,
+      transparent 84%
+    );
+    animation: pure-material-progress-linear 2s infinite linear;
+  }
+
+  .pure-material-progress-linear:indeterminate::-moz-progress-bar {
+    @apply bg-transparent;
+  }
+
+  .pure-material-progress-linear:indeterminate::-ms-fill {
+    animation-name: none;
+  }
+
+  @keyframes pure-material-progress-linear {
+    0% {
+      background-size: 200% 100%;
+      background-position: left -31.25% top 0%;
+    }
+    50% {
+      background-size: 800% 100%;
+      background-position: left -49% top 0%;
+    }
+    100% {
+      background-size: 400% 100%;
+      background-position: left -102% top 0%;
+    }
   }
 }
 
