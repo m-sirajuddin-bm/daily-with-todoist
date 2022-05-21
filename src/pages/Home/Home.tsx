@@ -2,10 +2,12 @@ import { FolderAddIcon as FolderAddIconOut, PlusIcon } from "@heroicons/react/ou
 import { format, isBefore, isToday } from "date-fns";
 import { orderBy } from "lodash";
 import { useEffect, useState } from "react";
-import TaskSection from "../../components/TaskSection";
+import Task from "../../components/Task";
 import Loading from "../../components/utils/Loading";
+import { ActionTypes } from "../../consts";
 import { useAppContext } from "../../hooks";
 import { ITask } from "../../interfaces/todoist-data.interface";
+import { getLabelName, getProjectInfo, getSectionInfo } from "../../utils";
 
 interface IHomeTask {
   overdue: ITask[];
@@ -14,7 +16,7 @@ interface IHomeTask {
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
-  const { state } = useAppContext();
+  const { state, dispatchHandler } = useAppContext();
   const [homeTasks, setHomeTasks] = useState<IHomeTask>({
     overdue: [],
     today: [],
@@ -23,16 +25,24 @@ export default function Home() {
   useEffect(() => {
     if (state.details.sync_token === "*") return;
 
+    console.log(`[Home] update tasks!`);
+
     let overdueTasks = new Array();
     const todayTasks = new Array();
 
     state.details.items.forEach((f: ITask) => {
       // ignore non due/deleted tasks
-      if (!f.due || f.is_deleted) return;
+      if (!f.due || f.is_deleted || f.checked) return;
 
       const due = new Date(f.due.date);
       // add custom property 'dueDate' to sort item
       f.dueDate = due;
+
+      // add project/section/label details
+      f.project = getProjectInfo(state.details.projects, f.project_id);
+      f.section = getSectionInfo(state.details.sections, f.section_id);
+      f.labelList = getLabelName(state.details.labels, f.labels);
+
       const today = new Date(format(new Date(), "yyyy-MM-dd"));
       if (isBefore(due, today)) {
         // add custom property 'overdue' to identify overdue tasks
@@ -46,7 +56,7 @@ export default function Home() {
     overdueTasks = orderBy(
       overdueTasks,
       ["dueDate", "project_id", "child_order"],
-      ["asc", "asc", "desc"]
+      ["asc", "asc", "asc"]
     );
 
     const updatedTasks = {
@@ -59,7 +69,9 @@ export default function Home() {
     });
 
     setLoading(false);
-  }, [state.details]);
+  }, [state.details.items]);
+
+  // console.log(`[Home] updated!`);
 
   return (
     <>
@@ -107,7 +119,12 @@ export default function Home() {
               <span className="text-secondary">Get started by creating a new task</span>
             </div>
             <div>
-              <button className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary-800 p-3 px-4 text-sm font-medium text-primary-50 hover:bg-primary-600 hover:text-white hover:shadow-md">
+              <button
+                onClick={() => {
+                  dispatchHandler(ActionTypes.TOGGLEADDTASK, true);
+                }}
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary-800 p-3 px-4 text-sm font-medium text-primary-50 hover:bg-primary-600 hover:text-white hover:shadow-md"
+              >
                 <PlusIcon className="h-6 w-6" aria-hidden="true" />
                 <span className="block sm:hidden lg:block">New Task</span>
               </button>
@@ -118,10 +135,29 @@ export default function Home() {
         ""
       )}
 
-      <div className="flex w-full flex-col gap-2 rounded-2xl bg-white p-2">
-        {homeTasks.overdue.length ? <TaskSection name="overdue" tasks={homeTasks.overdue} /> : ""}
-        {homeTasks.today.length ? <TaskSection name="today" tasks={homeTasks.today} /> : ""}
-      </div>
+      {!loading && (
+        <div className="flex w-full flex-col gap-2 rounded-2xl bg-white p-2">
+          <Task>
+            {homeTasks.overdue.length ? (
+              <Task.Section name="overdue">
+                {homeTasks.overdue.map((task) => {
+                  return <Task.Item key={task.id} task={task} state={state} />;
+                })}
+              </Task.Section>
+            ) : (
+              <></>
+            )}
+
+            {
+              <Task.Section name={`${format(new Date(), "dd MMM")} ‧ today`}>
+                {homeTasks.today.map((task) => {
+                  return <Task.Item key={task.id} task={task} state={state} />;
+                })}
+              </Task.Section>
+            }
+          </Task>
+        </div>
+      )}
     </>
   );
 }
