@@ -1,14 +1,14 @@
-import { PlusIcon } from "@heroicons/react/outline";
-import { MenuIcon } from "@heroicons/react/solid";
+import { MenuIcon, PlusIcon } from "@heroicons/react/solid";
 import { useLocation } from "react-router-dom";
 import { ActionTypes } from "../../../consts";
 import { useAppContext } from "../../../hooks";
 export default function Header() {
   const location = useLocation();
-  const { dispatchHandler } = useAppContext();
+  const { state, dispatchHandler } = useAppContext();
 
   return (
-    <header className="px-sm mx-auto max-w-full border-b border-gray-200 bg-gray-100 px-3 sm:px-6 lg:px-8">
+    <header className="px-sm mx-auto max-w-full border-b border-gray-200 px-3 sm:px-6 lg:px-8">
+      {state.toggleProgress ? <progress className="pure-material-progress-linear" /> : <></>}
       <div className="relative flex h-16 items-center justify-between">
         <div className="flex items-center gap-3">
           <button
