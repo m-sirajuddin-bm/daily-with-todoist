@@ -61,6 +61,9 @@ export interface ITask {
   user_id: number;
   overdue?: boolean;
   dueDate?: Date;
+  project?: IProject;
+  section?: ISection;
+  labelList?: ILabel[];
 }
 
 export interface ITaskDue {
